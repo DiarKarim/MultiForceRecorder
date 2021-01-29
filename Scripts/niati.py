@@ -20,7 +20,7 @@ import socket
 import numpy as np
 import sys
 import winsound
-
+import pandas as pd
 
 def init_readForce(tsk1,S2,times,bias=np.zeros(6)):
 	data  = tsk1.read()
@@ -87,11 +87,6 @@ def SaveText(txWriter1,data):
 		# np.savetxt(txWriter1, data)
 		txWriter1.write(str(data.save) + "\n") # format to a better way
 
-def SaveJson(path, fileName, jsonText):
-	outfile = open(path + fileName, "w")
-	outfile.writelines(jsonText)
-	outfile.close()
-
 # Create a channel object
 def CreateNewTask(dev, sampleRate):
 	try: 
@@ -114,3 +109,25 @@ def CreateNewTask(dev, sampleRate):
 		pass
 
 	return task
+
+
+
+def SaveJson(ptxID,trialNum,path,fileName,fx,fy,fz,tx,ty,tz,t):
+
+	dataAll = None 
+	tmpResampled = list(zip(fx,fy,fz,tx,ty,tz,t))
+	tmpRes = pd.DataFrame(tmpResampled,columns=['Fx','Fy','Fz','Tx','Ty','Tz','Time'])
+
+	tmpRes.insert(0, "Participant_ID", ptxID , True) # Add participant id to dataframe
+	tmpRes.insert(0, "Trial", trialNum , True) # Add trial number to the dataframe 
+
+	if dataAll is None:
+		dataAll = tmpRes
+	else:
+		dataAll = pd.concat((dataAll, tmpRes))      
+
+	# Save to file 
+	outfile = open(path + fileName, "w")
+	jsonText = dataAll.to_json(orient="columns")
+	outfile.writelines(jsonText)
+	outfile.close()
