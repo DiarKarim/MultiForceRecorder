@@ -74,12 +74,18 @@ while toc < 1.0:
 	# ft_bias_plate2 += offsetForcePlate
 	# offsetForcePlate = ni.np.array(ni.init_readForce(task3,cal.S3,toc))
 	# ft_bias_plate3 += offsetForcePlate
-	offsetForcePlate = ni.np.array(ni.init_readForce(task4,cal.S4,toc))
+	offsetForcePlate = ni.np.array(ni.init_readForce(task4,cal.S15514,toc))
 	ft_bias_plate4 += offsetForcePlate
 	# offsetForcePlate = ni.np.array(ni.init_readForce(task5,cal.S5,toc))
 	# ft_bias_plate5 += offsetForcePlate
 	# offsetForcePlate = ni.np.array(ni.init_readForce(task6,cal.S6,toc))
 	# ft_bias_plate6 += offsetForcePlate
+
+# S15514
+# S16484
+# S16483
+# S05347
+# S05346
 
 	cnt = cnt+1
 	toc = ni.time.time() - tic
@@ -154,7 +160,7 @@ for tr in range (currentTrial,numTrials):
 				# plateForce1.append(ni.readForce(task1,cal.S1,ni.time.time(),ft_bias_plate1)) #sock,address
 				# plateForce2.append(ni.readForce(task2,cal.S2,ni.time.time(),ft_bias_plate2)) #sock,address
 				# plateForce3.append(ni.readForce(task3,cal.S3,ni.time.time(),ft_bias_plate3)) #sock,address
-				plateForce4.append(ni.readForce(task4,cal.S4,ni.time.time(),ft_bias_plate4)) #sock,address
+				plateForce4.append(ni.readForce(task4,cal.S15514,ni.time.time(),ft_bias_plate4)) #sock,address
 				# plateForce5.append(ni.readForce(task5,cal.S5,ni.time.time(),ft_bias_plate5)) #sock,address
 				# plateForce6.append(ni.readForce(task6,cal.S6,ni.time.time(),ft_bias_plate6)) #sock,address
 
