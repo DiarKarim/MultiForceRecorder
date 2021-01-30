@@ -29,6 +29,15 @@ import aticalibration as cal
 import json 
 
 #*************************************************************************
+#************************** Get user input *******************************
+#*************************************************************************
+groupID = raw_input("Group ID number: ")
+trialNum = raw_input("Number of trials: ")
+currentTrial = input("Start from trial number: ")
+condition = input("Condition: ")
+trialDur = raw_input("Trial duration: ")
+
+#*************************************************************************
 # *************************** Experiment Parameters ********************
 #*************************************************************************
 sR = 900
@@ -36,13 +45,9 @@ sC = 0 # loop counter
 quit = False
 #Force_all = [] # collect all data in this variable
 raw_data = ni.np.array([[0,0,0,0,0,0],[0,0,0,0,0,0]])
-numTrials = 3
+numTrials = trialNum
 
-#*************************************************************************
-#************************** Get user input *******************************
-#*************************************************************************
-currentTrial = input("Start from trial number: ")
-groupID = raw_input("Group ID: ")
+
 #*************************************************************************
 #*********************** National Instruments details ********************
 #*************************************************************************
@@ -107,7 +112,7 @@ for tr in range (currentTrial,numTrials):
 	dataFolder = "D:/OneDrive/Documents/Projects/MultiForceRecorder/Data/"
 	fileName = "Trial_" + str(tr) + ".json"
 
-	f4 = dataFolder + fname + "ID" + "_" + str(groupID) + "_Tr_" + str(tr) + ".json"
+	f4 = dataFolder + fname + "ID" + "_" + str(groupID) + "_Condition_" + str(condition) + "_Tr_" + str(tr) + ".json"
 
 	# raw_input("Enter when ready ...")
 	ni.beepSound()
@@ -123,7 +128,7 @@ for tr in range (currentTrial,numTrials):
 	frc_frac = 1.0/sampleRate_frc
 	pos_frac = 1.0/sampleRate_pos
 
-	trialDuration = 0.1 # seconds
+	trialDuration = trialDur # seconds
 	sC_frc = 0
 	sC_pos = 0
 
