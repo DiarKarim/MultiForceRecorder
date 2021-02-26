@@ -31,11 +31,11 @@ import json
 #*************************************************************************
 #************************** Get user input *******************************
 #*************************************************************************
-groupID = raw_input("Group ID number: ")
-trialNum = raw_input("Number of trials: ")
+groupID = input("Group ID number: ")
+trialNum = input("Number of trials: ")
 currentTrial = input("Start from trial number: ")
 condition = input("Condition: ")
-trialDur = raw_input("Trial duration: ")
+trialDur = input("Trial duration: ")
 
 #*************************************************************************
 # *************************** Experiment Parameters ********************
@@ -46,7 +46,6 @@ quit = False
 #Force_all = [] # collect all data in this variable
 raw_data = ni.np.array([[0,0,0,0,0,0],[0,0,0,0,0,0]])
 numTrials = trialNum
-
 
 #*************************************************************************
 #*********************** National Instruments details ********************
@@ -101,6 +100,16 @@ print "Calibration done."
 # raw_input('Enter to start ...')
 for tr in range (currentTrial,numTrials):
 	
+	#*************************************************************************
+	#*********************** National Instruments details ********************
+	#*************************************************************************
+	task1 = ni.CreateNewTask("Dev1", sR)
+	task2 = ni.CreateNewTask("Dev3", sR)
+	task3 = ni.CreateNewTask("Dev4", sR)
+	task4 = ni.CreateNewTask("Dev5", sR)
+	task5 = ni.CreateNewTask("Dev6", sR)
+	task6 = ni.CreateNewTask("Dev10", sR)
+
 	# print "Waiting to receive experiment info ..."
 	# expInfo = ReadExperiment(sock2)
 	# print expInfo
@@ -108,8 +117,8 @@ for tr in range (currentTrial,numTrials):
 	# Al's Matlab staircase goes here and spits out the conditions and trial numbers 
 	# fname = raw_input("File name: ")
 	fname = "ConditionInfo_"
-	# dataFolder = "C:/Users/Hulk/Documents/Projects/SixATI_Touch/Data/"
-	dataFolder = "D:/OneDrive/Documents/Projects/MultiForceRecorder/Data/"
+	dataFolder = "C:/Users/Hulk/Documents/Projects/SixATI_Touch/Data/"
+	# dataFolder = "D:/OneDrive/Documents/Projects/MultiForceRecorder/Data/"
 	fileName = "Trial_" + str(tr) + ".json"
 
 	f4 = dataFolder + fname + "ID" + "_" + str(groupID) + "_Condition_" + str(condition) + "_Tr_" + str(tr) + ".json"
@@ -183,7 +192,7 @@ for tr in range (currentTrial,numTrials):
 	# Transfer to the "niati.py" library module in the future 
 	tmpResampled = list(zip(fpDat_1,fpDat_2,fpDat_3,fpDat_4,fpDat_5,fpDat_6,timeDat))
 	tmpRes = ni.pd.DataFrame(tmpResampled,columns=['FT1','FT2','FT3','FT4','FT5','FT6','Time'])
-	tmpRes.insert(0, "Participant_ID", groupIDx , True) # Add participant id to dataframe
+	tmpRes.insert(0, "Group_ID", groupIDx , True) # Add participant id to dataframe
 	tmpRes.insert(0, "Trial", trialNum , True) # Add trial number to the dataframe 
 
 	print tmpRes
@@ -200,11 +209,19 @@ for tr in range (currentTrial,numTrials):
 	if contFlag == 0:
 		break	
 
-## Cleanup tasks
-task1.clear()
-task2.clear()
-task3.clear()
-task4.clear()
-task5.clear()
-task6.clear()
-print "Force sensor task objects cleaned up."
+	## Cleanup tasks
+	task1.clear()
+	task2.clear()
+	task3.clear()
+	task4.clear()
+	task5.clear()
+	task6.clear()
+
+	del task1
+	del task2 
+	del task3
+	del task4 
+	del task5
+	del task6
+
+	print "Force sensor task objects cleaned up."
