@@ -31,11 +31,17 @@ import json
 #*************************************************************************
 #************************** Get user input *******************************
 #*************************************************************************
+ptx1 = input("Participant 1 ID number: ")
+ptx2 = input("Participant 2 ID number: ")
+ptx3 = input("Participant 3 ID number: ")
+
 groupID = input("Group ID number: ")
+blockID = input("Block number: ")
 trialNum = input("Number of trials: ")
 currentTrial = input("Start from trial number: ")
 condition = input("Condition: ")
-trialDur = input("Trial duration: ")
+
+trialDur = 10 #input("Trial duration: ")
 
 #*************************************************************************
 # *************************** Experiment Parameters ********************
@@ -50,40 +56,40 @@ numTrials = trialNum
 #*************************************************************************
 #*********************** National Instruments details ********************
 #*************************************************************************
-task1 = ni.CreateNewTask("Dev1", sR)
+task1 = ni.CreateNewTask("Dev7", sR)
 task2 = ni.CreateNewTask("Dev3", sR)
-task3 = ni.CreateNewTask("Dev4", sR)
-task4 = ni.CreateNewTask("Dev5", sR)
-task5 = ni.CreateNewTask("Dev6", sR)
-task6 = ni.CreateNewTask("Dev10", sR)
+task3 = ni.CreateNewTask("Dev8", sR)
+# task4 = ni.CreateNewTask("Dev5", sR)
+# task5 = ni.CreateNewTask("Dev6", sR)
+# task6 = ni.CreateNewTask("Dev10", sR)
 
 #****************************** Main Loop ********************************
 tic = ni.time.time()
 toc = 0
 cnt = 0
-ft_bias_probe = ni.np.zeros(6)
+# ft_bias_probe = ni.np.zeros(6)
 ft_bias_plate1 = ni.np.zeros(6)
 ft_bias_plate2 = ni.np.zeros(6)
 ft_bias_plate3 = ni.np.zeros(6)
-ft_bias_plate4 = ni.np.zeros(6)
-ft_bias_plate5 = ni.np.zeros(6)
-ft_bias_plate6 = ni.np.zeros(6)
+# ft_bias_plate4 = ni.np.zeros(6)
+# ft_bias_plate5 = ni.np.zeros(6)
+# ft_bias_plate6 = ni.np.zeros(6)
 
 print "Calibrating bias for 1s, please do not touch the ft sensor..."
 while toc < 1.0:
 
 	offsetForcePlate = ni.np.array(ni.init_readForce(task1,cal.S15514,toc))
 	ft_bias_plate1 += offsetForcePlate
-	offsetForcePlate = ni.np.array(ni.init_readForce(task2,cal.S16484,toc))
+	offsetForcePlate = ni.np.array(ni.init_readForce(task2,cal.S16483,toc))
 	ft_bias_plate2 += offsetForcePlate
-	offsetForcePlate = ni.np.array(ni.init_readForce(task3,cal.S16483,toc))
+	offsetForcePlate = ni.np.array(ni.init_readForce(task3,cal.S16484,toc))
 	ft_bias_plate3 += offsetForcePlate
-	offsetForcePlate = ni.np.array(ni.init_readForce(task4,cal.S05347,toc))
-	ft_bias_plate4 += offsetForcePlate
-	offsetForcePlate = ni.np.array(ni.init_readForce(task5,cal.S05346,toc))
-	ft_bias_plate5 += offsetForcePlate
-	offsetForcePlate = ni.np.array(ni.init_readForce(task6,cal.S6,toc))
-	ft_bias_plate6 += offsetForcePlate
+	# offsetForcePlate = ni.np.array(ni.init_readForce(task4,cal.S05347,toc))
+	# ft_bias_plate4 += offsetForcePlate
+	# offsetForcePlate = ni.np.array(ni.init_readForce(task5,cal.S05346,toc))
+	# ft_bias_plate5 += offsetForcePlate
+	# offsetForcePlate = ni.np.array(ni.init_readForce(task6,cal.S6,toc))
+	# ft_bias_plate6 += offsetForcePlate
 
 	cnt = cnt+1
 	toc = ni.time.time() - tic
@@ -91,11 +97,14 @@ while toc < 1.0:
 ft_bias_plate1 /= cnt
 ft_bias_plate2 /= cnt
 ft_bias_plate3 /= cnt
-ft_bias_plate4 /= cnt
-ft_bias_plate5 /= cnt
-ft_bias_plate6 /= cnt
+# ft_bias_plate4 /= cnt
+# ft_bias_plate5 /= cnt
+# ft_bias_plate6 /= cnt
 
 print "Calibration done."
+
+stationDeviceID = ['Dev7','Dev3','Dev8']
+stationCounter = 1
 
 # raw_input('Enter to start ...')
 for tr in range (currentTrial,numTrials):
@@ -103,12 +112,12 @@ for tr in range (currentTrial,numTrials):
 	#*************************************************************************
 	#*********************** National Instruments details ********************
 	#*************************************************************************
-	task1 = ni.CreateNewTask("Dev1", sR)
+	task1 = ni.CreateNewTask("Dev7", sR)
 	task2 = ni.CreateNewTask("Dev3", sR)
-	task3 = ni.CreateNewTask("Dev4", sR)
-	task4 = ni.CreateNewTask("Dev5", sR)
-	task5 = ni.CreateNewTask("Dev6", sR)
-	task6 = ni.CreateNewTask("Dev10", sR)
+	task3 = ni.CreateNewTask("Dev8", sR)
+	# task4 = ni.CreateNewTask("Dev5", sR)
+	# task5 = ni.CreateNewTask("Dev6", sR)
+	# task6 = ni.CreateNewTask("Dev10", sR)
 
 	# print "Waiting to receive experiment info ..."
 	# expInfo = ReadExperiment(sock2)
@@ -117,11 +126,22 @@ for tr in range (currentTrial,numTrials):
 	# Al's Matlab staircase goes here and spits out the conditions and trial numbers 
 	# fname = raw_input("File name: ")
 	fname = "ConditionInfo_"
-	dataFolder = "C:/Users/Hulk/Documents/Projects/SixATI_Touch/Data/"
+	dataFolder = "D:/Projects/MultiForceRecorder/Data/"
 	# dataFolder = "D:/OneDrive/Documents/Projects/MultiForceRecorder/Data/"
-	fileName = "Trial_" + str(tr) + ".json"
 
-	f4 = dataFolder + fname + "ID" + "_" + str(groupID) + "_Condition_" + str(condition) + "_Tr_" + str(tr) + ".json"
+	if groupID % 18 == 0:
+		groupID = groupID + 1
+
+	if blockID % 6 == 0 & blockID <= 3:
+		blockID = blockID + 1
+	else:
+		blockID = 1 
+
+	fileName1 = dataFolder + "ParticipantID_" + str(ptx1) +  "_GroupID_" + str(groupID) + "_BlockID_" + str(blockID) + "_Condition_" + condition + "_Trial_" + str(tr) + ".json"
+	fileName2 = dataFolder + "ParticipantID_" + str(ptx2) +  "_GroupID_" + str(groupID) + "_BlockID_" + str(blockID) + "_Condition_" + condition + "_Trial_" + str(tr) + ".json"
+	fileName3 = dataFolder + "ParticipantID_" + str(ptx3) +  "_GroupID_" + str(groupID) + "_BlockID_" + str(blockID) + "_Condition_" + condition + "_Trial_" + str(tr) + ".json"
+
+	# f4 = dataFolder + fname + "ID" + "_" + str(groupID) + "_Condition_" + str(condition) + "_Tr_" + str(tr) + ".json"
 
 	# raw_input("Enter when ready ...")
 	ni.beepSound()
@@ -129,7 +149,8 @@ for tr in range (currentTrial,numTrials):
 
 
 	probeForce, posData, frc_time, pos_time, time_elapsed = [],[],[],[],[]
-	plateForce1,plateForce2,plateForce3,plateForce4,plateForce5,plateForce6 = [],[],[],[],[],[]
+	plateForce1,plateForce2,plateForce3 = [],[],[]
+	# plateForce1,plateForce2,plateForce3,plateForce4,plateForce5,plateForce6 = [],[],[],[],[],[]
 
 	sampleRate_frc = sR # this number should be the same as sR defined above 
 	sampleRate_pos = 200.0 # this number should be the same as set in Qualisys 
@@ -150,11 +171,11 @@ for tr in range (currentTrial,numTrials):
 		try: 
 			if toc > (sC_frc * frc_frac):
 				plateForce1.append(ni.readForce(task1,cal.S15514,ni.time.time(),ft_bias_plate1)) 
-				plateForce2.append(ni.readForce(task2,cal.S16484,ni.time.time(),ft_bias_plate2)) 
-				plateForce3.append(ni.readForce(task3,cal.S16483,ni.time.time(),ft_bias_plate3)) 
-				plateForce4.append(ni.readForce(task4,cal.S05347,ni.time.time(),ft_bias_plate4)) 
-				plateForce5.append(ni.readForce(task5,cal.S05346,ni.time.time(),ft_bias_plate5)) 
-				plateForce6.append(ni.readForce(task6,cal.S6,ni.time.time(),ft_bias_plate6)) 
+				plateForce2.append(ni.readForce(task2,cal.S16483,ni.time.time(),ft_bias_plate2)) 
+				plateForce3.append(ni.readForce(task3,cal.S16484,ni.time.time(),ft_bias_plate3)) 
+				# plateForce4.append(ni.readForce(task4,cal.S05347,ni.time.time(),ft_bias_plate4)) 
+				# plateForce5.append(ni.readForce(task5,cal.S05346,ni.time.time(),ft_bias_plate5)) 
+				# plateForce6.append(ni.readForce(task6,cal.S6,ni.time.time(),ft_bias_plate6)) 
 
 				sC_frc += 1
 				frc_time.append(ni.time.time())
@@ -171,39 +192,68 @@ for tr in range (currentTrial,numTrials):
 	task1.stop()
 	task2.stop()
 	task2.stop()
-	task4.stop()
-	task5.stop()
-	task6.stop()
+	# task4.stop()
+	# task5.stop()
+	# task6.stop()
 	# Plot data here after every trial to check validity and ask for user response 
  
 
 	fpDat_4 = []
 	# New way to convert data into a pandas data frame then save it as a json file 
-	fpDat_1 = ni.np.asarray(plateForce1)
-	fpDat_2 = ni.np.asarray(plateForce2)
-	fpDat_3 = ni.np.asarray(plateForce3)
-	fpDat_4 = ni.np.asarray(plateForce4)
-	fpDat_5 = ni.np.asarray(plateForce5)
-	fpDat_6 = ni.np.asarray(plateForce6)
+
+	print "BlockID: " + str(blockID) + "\n"
+	if blockID == 1:
+		fpDat_1 = ni.np.asarray(plateForce1)
+		fpDat_2 = ni.np.asarray(plateForce2)
+		fpDat_3 = ni.np.asarray(plateForce3)
+	if blockID == 2:
+		fpDat_1 = ni.np.asarray(plateForce2)
+		fpDat_2 = ni.np.asarray(plateForce3)
+		fpDat_3 = ni.np.asarray(plateForce1)
+	if blockID == 3:
+		fpDat_1 = ni.np.asarray(plateForce3)
+		fpDat_2 = ni.np.asarray(plateForce1)
+		fpDat_3 = ni.np.asarray(plateForce2)
+
 	timeDat = ni.np.asarray(frc_time)
 	trialNum = ni.np.repeat(str(tr),len(timeDat),axis=None)
 	groupIDx = ni.np.repeat(groupID,len(timeDat),axis=None)
 
 	# Transfer to the "niati.py" library module in the future 
-	tmpResampled = list(zip(fpDat_1,fpDat_2,fpDat_3,fpDat_4,fpDat_5,fpDat_6,timeDat))
-	tmpRes = ni.pd.DataFrame(tmpResampled,columns=['FT1','FT2','FT3','FT4','FT5','FT6','Time'])
-	tmpRes.insert(0, "Group_ID", groupIDx , True) # Add participant id to dataframe
-	tmpRes.insert(0, "Trial", trialNum , True) # Add trial number to the dataframe 
+	tmpResampled1 = list(zip(fpDat_1,timeDat)) # fpDat_4,fpDat_5,fpDat_6
+	tmpResampled2 = list(zip(fpDat_2,timeDat)) # fpDat_4,fpDat_5,fpDat_6
+	tmpResampled3 = list(zip(fpDat_3,timeDat)) # fpDat_4,fpDat_5,fpDat_6
 
-	print tmpRes
-	print "\n Type: " , type(tmpResampled) , " Shape: ", len(tmpResampled) , "\n"
+	tmpRes1 = ni.pd.DataFrame(tmpResampled1,columns=['FT1','Time']) # ,'FT4','FT5','FT6'
+	tmpRes1.insert(0, "Trial", trialNum , True) # Add trial number to the dataframe 
+	tmpRes1.insert(0, "Group_ID", groupIDx , True) # Add participant id to dataframe
+
+	tmpRes2 = ni.pd.DataFrame(tmpResampled2,columns=['FT2','Time']) # ,'FT4','FT5','FT6'
+	tmpRes2.insert(0, "Trial", trialNum , True) # Add trial number to the dataframe 
+	tmpRes2.insert(0, "Group_ID", groupIDx , True) # Add participant id to dataframe
+
+	tmpRes3 = ni.pd.DataFrame(tmpResampled3,columns=['FT3','Time']) # ,'FT4','FT5','FT6'
+	tmpRes3.insert(0, "Trial", trialNum , True) # Add trial number to the dataframe 
+	tmpRes3.insert(0, "Group_ID", groupIDx , True) # Add participant id to dataframe
+	# print tmpRes
+	# print "\n Type: " , type(tmpResampled) , " Shape: ", len(tmpResampled) , "\n"
 
 	# Save to file 
-	outfile = open(f4, "w")
-	jsonText = tmpRes.to_json(orient="columns")
+	outfile1 = open(fileName1, "w")
+	jsonText1 = tmpRes1.to_json(orient="columns")
+	outfile1.writelines(jsonText1)
+	outfile1.close()
+
+	outfile2 = open(fileName2, "w")
+	jsonText2 = tmpRes2.to_json(orient="columns")
+	outfile2.writelines(jsonText2)
+	outfile2.close()
+
+	outfile3 = open(fileName3, "w")
+	jsonText3 = tmpRes3.to_json(orient="columns")
+	outfile3.writelines(jsonText3)
+	outfile3.close()
 	# jsonFile = json.dumps(jsonText, indent=4)  
-	outfile.writelines(jsonText)
-	outfile.close()
 
 	contFlag = input("Press (1) for next trial or press zero (0) to stop: ")
 	if contFlag == 0:
@@ -213,15 +263,15 @@ for tr in range (currentTrial,numTrials):
 	task1.clear()
 	task2.clear()
 	task3.clear()
-	task4.clear()
-	task5.clear()
-	task6.clear()
+	# task4.clear()
+	# task5.clear()
+	# task6.clear()
 
 	del task1
 	del task2 
 	del task3
-	del task4 
-	del task5
-	del task6
+	# del task4 
+	# del task5
+	# del task6
 
 	print "Force sensor task objects cleaned up."

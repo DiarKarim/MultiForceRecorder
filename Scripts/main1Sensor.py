@@ -27,7 +27,7 @@ from datetime import datetime
 import niati as ni
 import aticalibration as cal
 import json 
-
+import time
 #*************************************************************************
 #************************** Get user input *******************************
 #*************************************************************************
@@ -35,13 +35,13 @@ groupID = 123 #input("Group ID number: ")
 trialNum = 123 #input("Number of trials: ")
 currentTrial = 1 #input("Start from trial number: ")
 condition = 123 #input("Condition: ")
-trialDur = 5 #input("Trial duration: ")
+trialDur = 30 #input("Trial duration: ")
 
 #*************************************************************************
 # *************************** Experiment Parameters ********************
 #*************************************************************************
-deviceID = "Dev1"
-sR = 900
+deviceID = "Dev7"
+sR = 1000
 sC = 0 # loop counter
 quit = False
 #Force_all = [] # collect all data in this variable
@@ -60,10 +60,10 @@ cnt = 0
 ft_bias_probe = ni.np.zeros(6)
 ft_bias_plate1 = ni.np.zeros(6)
 
-print "Calibrating bias for 1s, please do not touch the ft sensor..."
+print ("Calibrating bias for 1s, please do not touch the ft sensor...")
 while toc < 1.0:
 
-	offsetForcePlate = ni.np.array(ni.init_readForce(task1,cal.S16484,toc))
+	offsetForcePlate = ni.np.array(ni.init_readForce(task1,cal.S15514,toc))
 	ft_bias_plate1 += offsetForcePlate
 
 	cnt = cnt+1
@@ -71,7 +71,7 @@ while toc < 1.0:
 
 ft_bias_plate1 /= cnt
 
-print "Calibration done."
+print ("Calibration done.")
 
 # raw_input('Enter to start ...')
 for tr in range (currentTrial,numTrials):
@@ -88,7 +88,7 @@ for tr in range (currentTrial,numTrials):
 	ft_bias_plate1 = ni.np.zeros(6)
 	while toc < 0.15:
 
-		offsetForcePlate = ni.np.array(ni.init_readForce(task1,cal.S16484,toc))
+		offsetForcePlate = ni.np.array(ni.init_readForce(task1,cal.S15514,toc))
 		ft_bias_plate1 += offsetForcePlate
 
 		cnt = cnt+1
@@ -103,15 +103,15 @@ for tr in range (currentTrial,numTrials):
 	# Al's Matlab staircase goes here and spits out the conditions and trial numbers 
 	# fname = raw_input("File name: ")
 	fname = "ConditionInfo_"
-	dataFolder = "C:/Users/HULK/Documents/Projects/MultiForceRecorder/Data/"
+	dataFolder = "D:/Projects/MultiForceRecorder/Data"
 	# dataFolder = "D:/OneDrive/Documents/Projects/MultiForceRecorder/Data/"
 	fileName = "Trial_" + str(tr) + ".json"
 
 	f4 = dataFolder + fname + "ID" + "_" + str(groupID) + "_Condition_" + str(condition) + "_Tr_" + str(tr) + ".json"
 
 	# raw_input("Enter when ready ...")
-	ni.beepSound()
-	print "Recording trial: " + str(tr)
+	ni.beepSound(1000)
+	print ("Recording trial: " + str(tr))
 
 
 	probeForce, posData, frc_time, pos_time, time_elapsed = [],[],[],[],[]
@@ -128,26 +128,30 @@ for tr in range (currentTrial,numTrials):
 	sC_pos = 0
 
 	toc = 0
-	tic = ni.time.time()
+	toc1 = 0 
+	tic = time.clock()
+	tic1 = time.clock()
 	
 	# Main Thread runs experiment 
 	while toc < trialDuration:
-		toc = ni.time.time()-tic 
+		toc = time.clock()-tic
+		toc1 = time.clock()-tic1
 		try: 
-			if toc > (sC_frc * frc_frac):
-				plateForce1.append(ni.readForce(task1,cal.S16484,ni.time.time(),ft_bias_plate1)) 
+			if toc1 > 0.001:
+				plateForce1.append(ni.readForce(task1,cal.S15514,ni.time.clock(),ft_bias_plate1)) 
 
 				sC_frc += 1
-				frc_time.append(ni.time.time())
+				frc_time.append(toc)
+				tic1 = time.clock()
 
 			time_elapsed.append(ni.time.time())		
 
 		except Exception as e:
-			print e
+			print (e)
 
-	print "Total force samples collected:", sC_frc, " samples"
-	print "Time elapsed", toc, " seconds"
-	print "Observed Force Frequency", sC_frc/toc, " Hz"
+	print ("Total force samples collected:", sC_frc, " samples")
+	print ("Time elapsed", toc, " seconds")
+	print ("Observed Force Frequency", sC_frc/toc, " Hz")
 
 	task1.stop()
 
@@ -173,13 +177,16 @@ for tr in range (currentTrial,numTrials):
 
 	# Plotting
 	#ni.plt(fpDat_1)
-	# print type(fpDat_1)
-	ni.plt.plot(fpDat_1)
+	print (ni.np.shape(fpDat_1))
+	#ni.plt.plot(fpDat_1[:,0],label = "x")
+	#ni.plt.plot(fpDat_1[:,1],label = "y")
+	ni.plt.plot(fpDat_1[:,2],label = "z")
+	ni.plt.legend()
 	ni.plt.show()
 
 	# Save to file 
 	outfile = open(f4, "w")
-	jsonText = tmpRes.to_json(orient="columns")
+	jsonText = tmpRes.to_json(orient="columns") # to_csv
 	# jsonFile = json.dumps(jsonText, indent=4)  
 	outfile.writelines(jsonText)
 	outfile.close()
@@ -193,4 +200,4 @@ for tr in range (currentTrial,numTrials):
 
 	del task1
 
-	print "Force sensor task objects cleaned up."
+	print ("Force sensor task objects cleaned up.")

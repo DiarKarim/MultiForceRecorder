@@ -58,8 +58,8 @@ def CalibrateForce(rawForce,S2):
 	forces_cal = [fx, fy, fz, tx, ty, tz]
 	return forces_cal
 
-def beepSound():
-	frequency = 1000  # Set Frequency in Hertz
+def beepSound(freq):
+	frequency = freq  # Set Frequency in Hertz
 	duration = 100  # Set Duration To 1000 ms == 1 second
 	winsound.Beep(frequency, duration)
 
@@ -103,7 +103,7 @@ def CreateNewTask(dev, sampleRate):
 		task.configure_sample_clock(sample_rate=sampleRate,samples_per_channel=1)
 
 	except Exception as e:
-		print e
+		print (e)
 		task.stop()
 		task.clear()
 		pass
