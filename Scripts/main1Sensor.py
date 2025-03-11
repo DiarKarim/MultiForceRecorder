@@ -28,6 +28,7 @@ import niati as ni
 import aticalibration as cal
 import json 
 import time
+
 #*************************************************************************
 #************************** Get user input *******************************
 #*************************************************************************
@@ -40,7 +41,7 @@ trialDur = 30 #input("Trial duration: ")
 #*************************************************************************
 # *************************** Experiment Parameters ********************
 #*************************************************************************
-deviceID = "Dev7"
+deviceID = "Dev1"
 sR = 1000
 sC = 0 # loop counter
 quit = False
@@ -53,6 +54,7 @@ numTrials = trialNum
 #*************************************************************************
 task1 = ni.CreateNewTask(deviceID, sR)
 
+
 #****************************** Main Loop ********************************
 tic = ni.time.time()
 toc = 0
@@ -63,7 +65,7 @@ ft_bias_plate1 = ni.np.zeros(6)
 print ("Calibrating bias for 1s, please do not touch the ft sensor...")
 while toc < 1.0:
 
-	offsetForcePlate = ni.np.array(ni.init_readForce(task1,cal.S15514,toc))
+	offsetForcePlate = ni.np.array(ni.init_readForce(task1,cal.S05346,toc))
 	ft_bias_plate1 += offsetForcePlate
 
 	cnt = cnt+1
@@ -88,7 +90,7 @@ for tr in range (currentTrial,numTrials):
 	ft_bias_plate1 = ni.np.zeros(6)
 	while toc < 0.15:
 
-		offsetForcePlate = ni.np.array(ni.init_readForce(task1,cal.S15514,toc))
+		offsetForcePlate = ni.np.array(ni.init_readForce(task1,cal.S05346,toc))
 		ft_bias_plate1 += offsetForcePlate
 
 		cnt = cnt+1
@@ -138,7 +140,7 @@ for tr in range (currentTrial,numTrials):
 		toc1 = time.clock()-tic1
 		try: 
 			if toc1 > 0.001:
-				plateForce1.append(ni.readForce(task1,cal.S15514,ni.time.clock(),ft_bias_plate1)) 
+				plateForce1.append(ni.readForce(task1,cal.S05346,ni.time.clock(),ft_bias_plate1)) 
 
 				sC_frc += 1
 				frc_time.append(toc)

@@ -89,10 +89,9 @@ def SaveText(txWriter1,data):
 
 # Create a channel object
 def CreateNewTask(dev, sampleRate):
+	task = daqmx.tasks.Task()
+	time.sleep(1)
 	try: 
-		task = daqmx.tasks.Task()
-		time.sleep(1)
-
 		MAX_CHANNELS = 6
 		for channel_idx in range(MAX_CHANNELS):
 			channel = daqmx.channels.AnalogInputVoltageChannel()
@@ -104,8 +103,8 @@ def CreateNewTask(dev, sampleRate):
 
 	except Exception as e:
 		print (e)
-		task.stop()
-		task.clear()
+		# task.stop()
+		# task.clear()
 		pass
 
 	return task
